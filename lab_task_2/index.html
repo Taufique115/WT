@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Grade Management</title>
+</head>
+<body>
+
+<h2>Student Grade Management</h2>
+
+<p>Student Name: <input type="text" id="name"></p>
+<p>Grade (0-100): <input type="number" id="grade"></p>
+
+<button onclick="addStudent()">Add Student</button>
+<button onclick="clearAll()">Clear All</button>
+
+<hr>
+
+<h3>Student List:</h3>
+<div id="list">No students added yet</div>
+
+<h3>Statistics:</h3>
+<div id="stats">No statistics available</div>
+
+<hr>
+
+<button onclick="doubleGrades()">Double Grades</button>
+<button onclick="resetGrades()">Reset Grades</button>
+
+<script>
+    let students = [];
+    let savedGrades = [];
+
+    function addStudent() {
+        let name = document.getElementById("name").value.trim();
+        let grade = Number(document.getElementById("grade").value);
+
+        if (!name || isNaN(grade)) return alert("Enter valid name & grade.");
+        if (grade < 0 || grade > 100) return alert("Grade must be 0–100.");
+
+        students.push({ name, grade });
+        savedGrades.push(grade);
+
+        document.getElementById("name").value = "";
+        document.getElementById("grade").value = "";
+
+        showStudents();
+        showStats();
+    }
+
+    function showStudents() {
+        let box = document.getElementById("list");
+
+        if (students.length === 0) {
+            box.innerHTML = "No students added yet";
+            return;
+        }
+
+        box.innerHTML = students
+            .map(s => `- ${s.name}: ${s.grade} points`)
+            .join("<br>");
+    }
+
+    function showStats() {
+        let box = document.getElementById("stats");
+
+        if (students.length === 0) {
+            box.innerHTML = "No statistics available";
+            return;
+        }
+
+        let grades = students.map(s => s.grade);
+        let total = students.length;
+        let sum = grades.reduce((a, b) => a + b, 0);
+        let avg = (sum / total).toFixed(2);
+        let high = Math.max(...grades);
+        let low = Math.min(...grades);
+        let passRate = ((grades.filter(g => g >= 50).length / total) * 100).toFixed(2);
+
+        box.innerHTML = `
+            Total Students: ${total}<br>
+            Average Grade: ${avg}<br>
+            Highest Grade: ${high}<br>
+            Lowest Grade: ${low}<br>
+            Pass Rate: ${passRate}%
+        `;
+    }
+
+    function clearAll() {
+        students = [];
+        savedGrades = [];
+        document.getElementById("list").innerHTML = "No students added yet";
+        document.getElementById("stats").innerHTML = "No statistics available";
+    }
+
+    function doubleGrades() {
+        if (students.length === 0) return alert("No students to update.");
+
+        students.forEach(s => s.grade = Math.min(s.grade * 2, 100));
+
+        showStudents();
+        showStats();
+    }
+
+    function resetGrades() {
+        if (students.length === 0) return alert("No students to reset.");
+
+        students.forEach((s, i) => s.grade = savedGrades[i]);
+
+        showStudents();
+        showStats();
+    }
+</script>
+
+</body>
+</html>
